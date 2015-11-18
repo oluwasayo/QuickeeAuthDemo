@@ -11,7 +11,7 @@ import com.hextremelabs.quickee.security.BasicLoginParam;
 import static com.hextremelabs.quickee.security.ContextHelper.SESSION_ID;
 import com.hextremelabs.quickee.security.Role;
 import com.hextremelabs.quickee.security.Stakeholders;
-import com.hextremelabs.quickee.session.LeanSessionManager;
+import com.hextremelabs.quickee.session.AbstractSessionManager;
 import javax.annotation.Resource;
 import javax.ejb.EJBContext;
 import javax.ejb.Stateless;
@@ -27,6 +27,7 @@ import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -37,8 +38,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Stateless
 public class RestDemo {
 
+  //@Resource(lookup = "java:module/LeanSessionManager!com.hextremelabs.quickee.session.AbstractSessionManager")
   @Inject
-  private LeanSessionManager sessionManager;
+  private AbstractSessionManager sessionManager;
 
   @Resource
   private EJBContext ejbContext;
@@ -79,13 +81,13 @@ public class RestDemo {
   @Path("secure-request")
   @Auth // Verifies the cookie and ensures user is logged in, then sets up home-grown security context.
   @Stakeholders({Role.USER, Role.ADMIN}) // Ensures that only principals with USER or ADMIN role can invoke resource.
-  @Produces("text/plain")
+  @Produces(MediaType.APPLICATION_JSON)
   public Response secureRequest() {
-    return Response.ok("Authenticated successfully").build();
+    return Response.ok(new BaseResponse<>(0, "Authenticated successfully")).build();
   }
 
   @GET
-  @Path("secure-request")
+  @Path("unsecure-request")
   @Produces("text/plain")
   public Response unsecureRequest() {
     return Response.ok("Unsecured resource available to everyone.").build();
@@ -94,8 +96,11 @@ public class RestDemo {
   @XmlRootElement()
   public static class UserAccount {
 
+    @XmlElement(name = "id")
     private final Long id;
+    @XmlElement(name = "username")
     private final String username;
+    @XmlElement(name = "role")
     private final Role role;
 
     public UserAccount(Long id, String username, Role role) {
