@@ -17,5 +17,5 @@ import javax.ejb.Singleton;
 public class SessionManager extends AbstractSessionManager {
 
   @StaticConfig(key = "author.name")
-  private String name;
+  private static String name; // Quickee injector injects this config from DB.
 }

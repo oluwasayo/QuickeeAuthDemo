@@ -38,7 +38,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Stateless
 public class RestDemo {
 
-  //@Resource(lookup = "java:module/LeanSessionManager!com.hextremelabs.quickee.session.AbstractSessionManager")
   @Inject
   private AbstractSessionManager sessionManager;
 
@@ -48,12 +47,13 @@ public class RestDemo {
   @Context
   private HttpServletRequest request;
 
+  // Available at: http://localhost:8080/QuickeeAuthDemo/rest/demo/login
   @POST
   @Path("login")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   public Response login(BasicLoginParam param) {
-    // TODO: Get user id and role from user account in DB.
+    // TODO: You would normally get the user id and role from your user account entity in the DB.
     Long id = 123456l;
     final Role ROLE = Role.USER;
     String sessionId = sessionManager.generateNewSession(id, ROLE);
@@ -93,6 +93,9 @@ public class RestDemo {
     return Response.ok("Unsecured resource available to everyone.").build();
   }
 
+  /*
+   * User account DTO. Used in login response.
+   */
   @XmlRootElement()
   public static class UserAccount {
 
